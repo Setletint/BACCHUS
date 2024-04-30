@@ -16,7 +16,8 @@ app.get('/auctions', (req, res) => {
             auctions = response.data;
 
             let sem = new Bid
-            console.log(sem.checkBid('DASDA31231'))
+            highiestBid = sem.makeBid('DASDA31231','someUID',24);
+            
 
             res.send(auctions);
         }).catch((error) => {

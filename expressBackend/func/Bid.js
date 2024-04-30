@@ -1,38 +1,38 @@
-const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('./expressBackend/bidsDatabase.sqlite');
+const Database = require('better-sqlite3');
+const db = new Database('./expressBackend/bidsDatabase.sqlite');
+db.pragma('journal_mode = WAL');
 
 class Bid{
     createDatabase(){
-        db.serialize(()=>{
-            db.run(`CREATE TABLE bids(
-                auctionID varchar(255),
-                userID varchar(255),
-                highestBid DECIMAL(255,2)
-                );`)
-        })
+        db.exec(`CREATE TABLE bids(
+            auctionID varchar(255),
+            userID varchar(255),
+            highestBid DECIMAL(255,2)
+            );`)
+        
     }
     dropBidsTable(){
-        db.serialize(()=>{
-            db.run("DROP TABLE bids")
-        })
+        db.exec("DROP TABLE bids")
     }
 
-    checkBid(productId,userID,amount) {
+    /*checkBid(productId,userID,amount) {
         db.serialize(()=>{
-            db.get(`SELECT MAX(highestBid) FROM bids WHERE auctionID='`+productId+`'`, (err,row)=>{
+             db.get(`SELECT MAX(highestBid) FROM bids WHERE auctionID='`+productId+`'`, (err,row)=>{
                 if(err){
                     return console.error(err.message);
                 }
-                return row.highestBid
-            })
+                row = Object.entries(row)
+            }) 
         })
-    }
+    }*/
 
     makeBid(productId,userID,amount){
-        db.serialize(()=>{
-            db.run(`INSERT INTO bids(auctionID, userID, highestBid) VALUES ('`+productId+`','`+userID+`','`+amount+`')`)
-        })
+        const stmt = db.prepare(`INSERT INTO bids(auctionID, userID, highestBid) VALUES (?,?,?)`)
+        const inform = stmt.run(productId,userID,amount)
     }
 }
+
+let das = new Bid
+das.makeBid('DASDAS123','SomeUID',254)
 
 module.exports = Bid;

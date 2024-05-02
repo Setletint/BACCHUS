@@ -9,36 +9,40 @@ const auctionUrl = 'http://uptime-auction-api.azurewebsites.net/api/Auction';
 let auctions = new Array();
 
 var jsonParser = bodyParser.json()
- 
+
 app.get('/auctions', (req, res) => {
     axios.get('http://uptime-auction-api.azurewebsites.net/api/Auction')
         .then((response) => {
             auctions = response.data;
-
-            let sem = new Bid
-            highiestBid = sem.makeBid('DASDA31231','someUID',24);
-            
-
             res.send(auctions);
         }).catch((error) => {
             res.status(500).send('External server is disabled')
         })
 })
 
-app.post('/makebid', jsonParser ,(req,res)=>{
+app.post('/makebid', jsonParser, (req, res) => {
     console.log(req.body);
-    let userName   = req.body.name;
-    let userSurname= req.body.surname;
-    let auctionID  = req.body.auctionID;
+    let userName = req.body.name;
+    let userSurname = req.body.surname;
+    let auctionID = req.body.auctionID;
+    let amount = req.body.amount;
     let currentTimeDate = new Date;
 
-    if(userName && userSurname){
+    if (userName && userSurname) {
         userName = userName.replace(/\s/g, '');
         userSurname = userSurname.replace(/\s/g, '');
-        
+
         let bidID = userName + userSurname + currentTimeDate.toJSON();
         console.log(bidID);
+
+        let sem = new Bid
+        highiestBid = sem.checkBid(auctionID);
+
+        if (amount > highiestBid) {
+            sem.makeBid(auctionID, bidID, amount)
+        }
     }
+
 
 
     res.send('');

@@ -15,16 +15,11 @@ class Bid{
         db.exec("DROP TABLE bids")
     }
 
-    /*checkBid(productId,userID,amount) {
-        db.serialize(()=>{
-             db.get(`SELECT MAX(highestBid) FROM bids WHERE auctionID='`+productId+`'`, (err,row)=>{
-                if(err){
-                    return console.error(err.message);
-                }
-                row = Object.entries(row)
-            }) 
-        })
-    }*/
+    checkBid(productId) {
+        const maxBidObj = db.prepare(`SELECT MAX(highestBid) FROM bids WHERE auctionID=?`).get(productId);
+        const result = Object.entries(maxBidObj);
+        return result[0][1];
+    }
 
     makeBid(productId,userID,amount){
         const stmt = db.prepare(`INSERT INTO bids(auctionID, userID, highestBid) VALUES (?,?,?)`)
